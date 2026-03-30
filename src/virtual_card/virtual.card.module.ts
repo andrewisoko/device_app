@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { VirtualCardController } from './virtual_card.controller';
-import { VirtualCardService } from './virtual_card.service';
+import { VirtualCardController } from './virtual.card.controller';
+import { VirtualCardService } from './virtual.card.service';
 
 @Module({
   controllers: [VirtualCardController],

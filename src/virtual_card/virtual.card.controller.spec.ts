@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { VirtualCardController } from './virtual_card.controller';
+import { VirtualCardController } from './virtual.card.controller';
 
 describe('VirtualCardController', () => {
   let controller: VirtualCardController;

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { VirtualCardService } from './virtual_card.service';
+import { VirtualCardService } from './virtual.card.service';
 
 describe('VirtualCardService', () => {
   let service: VirtualCardService;
