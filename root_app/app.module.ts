@@ -16,7 +16,7 @@ import { Contract } from 'src/contract/entity/contract.entity';
   imports: [
     ConfigModule.forRoot({ 
       isGlobal:true,
-      envFilePath:__dirname + '/../../../.env'
+      envFilePath:__dirname + '/../../.env'
      }),
     TypeOrmModule.forRootAsync({
       imports:[
@@ -27,6 +27,7 @@ import { Contract } from 'src/contract/entity/contract.entity';
       ],
       inject:[ConfigService],
       useFactory:(configService:ConfigService) => {
+
         return {
           type: 'postgres',
         host: configService.get<string>('DB_HOST'),
