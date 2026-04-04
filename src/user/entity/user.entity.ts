@@ -7,16 +7,16 @@ export class User {
     @PrimaryGeneratedColumn('uuid')
         id:string;
 
-    @Column()
+    @Column( 'varchar', { length:50 , default: 'John James' })
         fullName:string;
 
-    @Column()
+    @Column( 'varchar', { length:12 , default: 'JoJames' } )
         userName:string;
 
-    @Column()
+    @Column('varchar', { length:30 , default: 'JohnJames100@email.com' })
         email:string;
 
-    @Column()
+    @Column( 'varchar', { default: 'Passwordxmx0'} )
         password:string;  
     
     @OneToMany( ()=>Account,accounts => accounts.user )

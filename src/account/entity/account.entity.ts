@@ -1,5 +1,5 @@
 import { User } from "src/user/entity/user.entity";
-import { Entity,PrimaryGeneratedColumn,Column, ManyToOne } from "typeorm";
+import { Entity,PrimaryGeneratedColumn,Column, ManyToOne,CreateDateColumn } from "typeorm";
 
 export enum STATUS {
 
@@ -16,13 +16,13 @@ export class Account {
     @PrimaryGeneratedColumn('uuid')
         id:string;
     
-    @Column()
+    @Column( { type:'integer', length:16, default: 1234567890123456} )
         accountNumber:number;
 
-    @Column()
+    @Column( 'decimal', { default:0 } )
         balance:number;
 
-    @Column()
+    @Column('varchar', { length:3 , default:'GBP' } )
         currency:string;
 
     @Column({
@@ -32,11 +32,10 @@ export class Account {
     })
         status:STATUS;
     
-       @Column()
-    createdAt:Date;
+    
 
-    @Column()
-    updatedAt:Date;
+    @CreateDateColumn( { name:'timestamp' } )
+        updatedAt:Date;
     
     @ManyToOne( ()=> User,user => user.accounts )
         user:User   
