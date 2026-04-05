@@ -1,11 +1,25 @@
 import { Entity,PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Account } from "src/account/entity/account.entity";
 
+
+export enum Role {
+    USER = "user",
+    ADMIN = "admin",
+}
+
 @Entity("User")
 export class User {
 
     @PrimaryGeneratedColumn('uuid')
         id:string;
+
+    @Column({
+        type:"enum",
+        enum: Role,
+        default:Role.USER,
+        })
+        role:Role
+
 
     @Column( 'varchar', { length:50 , default: 'John James' })
         fullName:string;
