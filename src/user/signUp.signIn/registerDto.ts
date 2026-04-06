@@ -7,7 +7,15 @@ export class RegisterDto{
 
     @IsString()
     @IsNotEmpty()
-    fullName:string  
+    name:string;
+
+    @IsString()
+    @IsNotEmpty()
+    surname:string; 
+
+    @IsString()
+    @IsNotEmpty()
+    userName:string; 
     
     
     @IsString()

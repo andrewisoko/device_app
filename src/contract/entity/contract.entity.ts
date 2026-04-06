@@ -39,6 +39,9 @@ export class Contract {
         @Column( { nullable:true } )
                 event_agreement:string;
 
+        @Column( { nullable:true } )
+                repayment_agreement:string;
+
         @OneToMany(()=>Transaction, transactions => transactions.contract)
                  transactions:Transaction[];
 }

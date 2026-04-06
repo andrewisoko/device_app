@@ -21,8 +21,11 @@ export class User {
         role:Role
 
 
-    @Column( 'varchar', { length:50 , default: 'John James' })
-        fullName:string;
+    @Column( 'varchar', { length:10 , default: 'John James' })
+        name:string;
+
+    @Column( 'varchar', { length:10 , default: 'John James' })
+        surname:string;
 
     @Column( 'varchar', { length:12 ,default: 'JoJames' } )
         userName:string;

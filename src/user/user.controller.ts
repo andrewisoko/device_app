@@ -28,11 +28,14 @@ export class UserController {
          async createUser(
             @Body() registerDto:RegisterDto
             ){
+                const randomFour = Math.floor(Math.random() * 100000) 
+                const userName = registerDto.name.slice(0,3) + registerDto.surname + randomFour.toString
                 const hashedpassword = await bcrypt.hash(registerDto.password,10)
                 return this.userService.createUser({
                     role:Role.USER,
-                    fullName:registerDto.fullName,
-                    // userName:registerDto.userName,
+                    name:registerDto.name,
+                    surname:registerDto.surname,
+                    userName:userName,
                     email:registerDto.email,
                     password:hashedpassword,
                     confirmPassword:hashedpassword
@@ -77,7 +80,4 @@ export class UserController {
                 // return "User Successfully deleted"
             return this.userService.deleteUser(idUser) 
     }
- 
-
-
 }

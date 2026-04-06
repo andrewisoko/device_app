@@ -35,10 +35,9 @@ export class SignUpSignInService {
 
          const payload = { 
              sub : user.id,
-             name: user.fullName,
             username:user.userName,
             email: user.email,
-            // role: user.role,
+            role: user.role,
         }
         
         const accessToken = this.jwtService.sign(payload, { expiresIn: '30m' });  
