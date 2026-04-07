@@ -20,6 +20,6 @@ export class Transaction {
     @CreateDateColumn({ name:'timestamp' })
          timestamp:Date
 
-    @ManyToOne( ()=>Contract, contract => contract.transactions )
+    @ManyToOne( () => Contract, contract => contract.transactions )
         contract:Contract
 }

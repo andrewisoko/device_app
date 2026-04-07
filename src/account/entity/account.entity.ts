@@ -16,7 +16,7 @@ export class Account {
     @PrimaryGeneratedColumn('uuid')
         id:string;
     
-    @Column( { type:'integer', length:16, default: 1234567890123456} )
+    @Column( { type:'integer',  default: 12345678 } )
         accountNumber:number;
 
     @Column( 'decimal', { default:0 } )
@@ -28,14 +28,14 @@ export class Account {
     @Column({
         type:'enum',
         enum:STATUS,
-        default:STATUS,
+        default:STATUS.PENDING,
     })
         status:STATUS;
     
     
 
     @CreateDateColumn( { name:'timestamp' } )
-        updatedAt:Date;
+        createdAt:Date;
     
     @ManyToOne( ()=> User,user => user.accounts )
         user:User   

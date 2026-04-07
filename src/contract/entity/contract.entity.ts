@@ -43,5 +43,5 @@ export class Contract {
                 repayment_agreement:string;
 
         @OneToMany(()=>Transaction, transactions => transactions.contract)
-                 transactions:Transaction[];
+                transactions:Transaction[];
 }
