@@ -72,6 +72,7 @@ export class ContractService {
                                 name:registerDto.name,
                                 surname:registerDto.surname,
                                 userName: `default_user${randomFour}`,
+                                mobileNumber:registerDto.mobileNumber,
                                 userType:UserType.DEFAULT,
                                 email:registerDto.email,
                                 password:password,

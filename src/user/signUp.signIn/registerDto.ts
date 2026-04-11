@@ -21,7 +21,11 @@ export class RegisterDto{
     @IsNotEmpty()
     userType:UserType; 
     
-    
+    @IsNumber()
+    // @IsNotEmpty()
+    mobileNumber: number;
+
+
     @IsString()
     @IsNotEmpty()
     email:string  

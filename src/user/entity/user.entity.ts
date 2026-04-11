@@ -39,6 +39,9 @@ export class User {
     @Column( 'varchar', { length:10 , default: 'James' })
         surname:string;
 
+    @Column( 'integer', { default:123435673 } )
+        mobile_number: number
+
     @Column( 'varchar', { length:12 ,default: 'JoJames2345' } )
         user_name:string;
 

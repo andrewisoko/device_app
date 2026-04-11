@@ -36,6 +36,7 @@ export class UserController {
                     name:registerDto.name,
                     surname:registerDto.surname,
                     userName:userName,
+                    mobileNumber:registerDto.mobileNumber,
                     userType:UserType.COMPETED,
                     email:registerDto.email,
                     password:hashedpassword,
@@ -43,13 +44,13 @@ export class UserController {
                 })
             }
 
-        @Post('login')
-    async login(
-    @Body() loginDto:LoginDto
-    ){
-        const user = await this.signUpSingIn.validateUser(loginDto.email,loginDto.password)
-        return this.signUpSingIn.login(user)
-    }
+    @Post('login')
+        async login(
+        @Body() loginDto:LoginDto
+        ){
+            const user = await this.signUpSingIn.validateUser(loginDto.email,loginDto.password)
+            return this.signUpSingIn.login(user)
+        }
 
     /**********************/
              /*Users*/

@@ -5,6 +5,8 @@ import { CARDTYPE, VirtualCard } from './entity/virtual.card.entity';
 
 
 
+
+
 @Injectable()
 export class VirtualCardService {
     constructor( @InjectRepository(VirtualCard) private readonly vcRepository:Repository<VirtualCard>){}
@@ -65,4 +67,6 @@ export class VirtualCardService {
         })
 
     }
+
+    
 }
