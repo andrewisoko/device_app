@@ -7,13 +7,31 @@ import { UserService } from 'src/user/user.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+
 @Injectable()
 export class AccountService {
-    constructor(@InjectModel('Account') private accountModel: Model<AccountDocument>,
+    constructor(
+        @InjectModel('Account') private accountModel: Model<AccountDocument>,
                 @InjectRepository(User) private userRepository:Repository<User>,
-                // private authService:AuthService,
+
                 private userService:UserService
     ){}
+
+
+       createExpiryDate(){
+
+          const expiryDateMonth = () => { 
+            const num =  Math.floor(Math.random() * 12 ).toString()
+            if( num.length < 2){
+                return '0'+ num
+            }
+            return num
+        }
+        const expiryDateYear = '36' 
+        const expiryDate = expiryDateMonth + '/' + expiryDateYear
+
+        return expiryDate
+    }
 
 
     async createAccount(currency:string,balance:number,username:string):Promise<Account>{ 
@@ -23,14 +41,20 @@ export class AccountService {
         if(!user) throw new NotFoundException("user not found")
 
         const accNumber = Math.floor(Math.random() * 1000000000 ) /* to check */
+        const pan = Math.floor(Math.random() * 10000000000000000 ).toString()
+         const expiryDate = this.createExpiryDate()
         console.log(accNumber)
         
         const newAccount = await this.accountModel.create({
 
             accountNumber:accNumber,
             currency:currency,
-            balance: balance,
-            user: user.id,
+            ledger_balance: balance,
+            available_balance:balance,
+            hold:0,
+            pan:pan,
+            expiry:expiryDate,
+            customer: user.id,
             status: ACCOUNT_STATUS.ACTIVE,
             createdAt: new Date()
         });
@@ -54,6 +78,8 @@ export class AccountService {
         return accounts;
     }
 
+
+
     async retrieveAccount(
         userNameClient: string,
         accountNumber: number
@@ -71,18 +97,18 @@ export class AccountService {
             account,
             userName: user.user_name,
         };
-    }
+    };
 
     async deleteAccount(accountId: string, password: string, username: string) {
         const account = await this.accountModel.findById(accountId).exec();
         if (!account) throw new NotFoundException("account not found");
 
         const user = await this.userService.findUserByUsername(username);
-        if (!user || account.user.toString() !== user.id) {
+        if (!user || account.customer.toString() !== user.id) {
             throw new UnauthorizedException("You do not own this account");
         }
 
-        if (account.balance > 0) throw new UnauthorizedException("Balance must be zero for account to be deleted.");
+        if (account.ledger_balance > 0 || account.available_balance > 0 || account.hold > 0) throw new UnauthorizedException("Balance must be zero for account to be deleted.");
         if (account.status === "Pending") throw new UnauthorizedException("Account still pending.");
 
         return this.accountModel.findByIdAndDelete(accountId).exec();

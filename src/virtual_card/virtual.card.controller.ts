@@ -7,9 +7,12 @@ export class VirtualCardController {
 
     @Post('create-main')
         createMain(
-            @Body() fullName: string
+            @Body() dataDto:{
+                fullName:string,
+                id:string,
+            }
         ){
-            return this.virtualCardService.createMainCard(fullName)
+            return this.virtualCardService.createMainCard(dataDto.fullName,dataDto.id)
         }
 
     @Post('create-temp')
@@ -17,15 +20,13 @@ export class VirtualCardController {
             @Body() dataDto:{
                 fullName:string,
                 expiryTime:string,
+                id:string
             }
         ){
-            return this.virtualCardService.createTempCard(dataDto.fullName,dataDto.expiryTime)
+            return this.virtualCardService.createTempCard(dataDto.fullName,dataDto.expiryTime,dataDto.id)
         }
 
-    @Post('create-expiry-date')
-        createExpiryDate(){
-            return this.virtualCardService.createExpiryDate()
-        }
+    
 
     @Post('generate-qr-code')
         generateQRCode(

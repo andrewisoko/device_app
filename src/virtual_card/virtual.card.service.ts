@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CARDTYPE, VirtualCard } from './entity/virtual.card.entity';
 import { JwtService } from '@nestjs/jwt';
+import { AccountDocument } from 'src/account/document/account.doc';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 
 
@@ -12,31 +15,31 @@ import { JwtService } from '@nestjs/jwt';
 export class VirtualCardService {
     constructor( 
         @InjectRepository(VirtualCard) private readonly vcRepository:Repository<VirtualCard>,
+        @InjectModel('Account') private readonly accountModel:Model<AccountDocument>,
         private readonly jwtService:JwtService,
 ){}
 
-    createExpiryDate(){
+    async account(id:string){
 
-          const expiryDateMonth = () => { 
-            const num =  Math.floor(Math.random() * 12 ).toString()
-            if( num.length < 2){
-                return '0'+ num
-            }
-            return num
+        const account = await this.accountModel.findOne({id:id}).exec()
+        if ( ! account ) throw new NotFoundException('account date not found')
+        
+        return { 
+            'expDate': account.expiry,
+            'pan': account.pan
         }
-        const expiryDateYear = '36' 
-        const expiryDate = expiryDateMonth + '/' + expiryDateYear
-
-        return expiryDate
     }
 
-    createMainCard(
-        fullName:string
+    async createMainCard(
+        fullName:string,
+        id:string
     ){
         const pan = Math.floor(Math.random() * 10000000000000000 ).toString()
         const CVC = Math.floor(Math.random() * 1000 ).toString()
-        const expiryDate = this.createExpiryDate()
-    
+        const account = await this.account(id)
+        const expiryDate = account['expDate']
+       
+      
       
         return this.vcRepository.create({
 
@@ -50,13 +53,17 @@ export class VirtualCardService {
         })
     }
 
-    createTempCard( 
-         fullName:string,
-         expiryTime:string,
+    async createTempCard( 
+
+        fullName:string,
+        expiryTime:string,
+        id:string
     ){
-        const pan = Math.floor(Math.random() * 10000000000000000 ).toString()
-        const CVC = Math.floor(Math.random() * 1000 ).toString() 
-        const expiryDate = this.createExpiryDate()
+
+        const CVC = Math.floor(Math.random() * 1000 ).toString();
+        const account = await this.account(id);
+        const expiryDate = account['expiryDate'];
+        const pan = account['pan'];
 
             return this.vcRepository.create({
 

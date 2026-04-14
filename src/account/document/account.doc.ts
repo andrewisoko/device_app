@@ -12,31 +12,52 @@ export enum ACCOUNT_STATUS {
 @Schema({ timestamps: true })
 export class Account extends Document {
 
+
+    @Prop({ type: String, default: 'Johnson Handsome' })
+        fullName: string;
     
     @Prop({ type: Number, default: 12345678 })
-    accountNumber: number;
+        accountNumber: number;
 
-    @Prop({ type: Number, default: 0 })
-    balance: number;
+    @Prop({type: String, default: '1234 7654 2345 0987' })
+        pan:string;
+
+    @Prop({ type: Number, precision: 15, scale: 2, default: 0 })
+        ledger_balance: number;
+
+    @Prop({ type: Number, precision: 15, scale: 2, default: 0 })
+        available_balance: number;
+    
+    @Prop({ type: Number, precision: 15, scale: 2, default: 0 })
+        hold: number;
 
     @Prop({ type: String, maxlength: 3, default: 'GBP' })
-    currency: string;
+        currency: string;
+
+    @Prop({ type: String, default: '99/33' })
+         expiry: string;
 
     @Prop({
         type: String,
         enum: ACCOUNT_STATUS,
         default: ACCOUNT_STATUS.PENDING,
     })
-    status: ACCOUNT_STATUS;
+        status: ACCOUNT_STATUS;
 
+        
+    @Prop({ type: [Types.ObjectId], ref: 'Transaction', default: [] })
+        transactions: Types.ObjectId[];
+    
+    @Prop({ type: [Types.ObjectId], ref: 'Ledger', default: [] })
+        ledgerEntries: Types.ObjectId[];
+    
     @Prop({ type: Types.ObjectId, ref: 'User' })
-    user: Types.ObjectId;
-
+        customer: Types.ObjectId;
     @Prop({ type: Date, default: Date.now })
-    createdAt: Date;
+        createdAt: Date;
 
     @Prop({ type: Date })
-    updatedAt: Date;
+        updatedAt: Date;
 }
 
 export type AccountDocument = HydratedDocument<Account>;
