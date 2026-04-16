@@ -1,8 +1,9 @@
 import { Controller,Post,Body } from '@nestjs/common';
 import { ContractService } from './contract.service';
-import { SPLIT_AGREEMENT } from './entity/contract.entity';
+import { SPLIT_AGREEMENT } from './document/contract.doc';
 import { Transaction } from 'src/transaction/entity/transaction.entity';
-import { CONTRACT_STATUS } from './entity/contract.entity';
+import { CONTRACT_STATUS } from './document/contract.doc';
+
 
 @Controller('contract')
     export class ContractController {
