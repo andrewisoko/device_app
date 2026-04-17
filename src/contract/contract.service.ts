@@ -23,8 +23,8 @@ export interface contractProps{
     contractStatus:CONTRACT_STATUS,
     sender_percentage?: number;
     sender_amount?: number;
-    receiver_percentage?: number;
-    receiver_amount?: number;
+    receiver_percentage?: number[];
+    receiver_amount?: number[];
     repayment_agreement?:string,
     event_agreement?:string,
     location_agreement?:string,

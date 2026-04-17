@@ -1,5 +1,5 @@
 import { Entity,PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from "typeorm";
-import { Contract } from "src/contract/entity/contract.entity";
+
 
 
 @Entity("transaction")
@@ -20,6 +20,6 @@ export class Transaction {
     @CreateDateColumn({ name:'timestamp' })
          timestamp:Date
 
-    @ManyToOne( () => Contract, contract => contract.transactions )
-        contract:Contract
+    @Column( 'varchar', {default:' contract_id'} )
+        contract :string;
 }

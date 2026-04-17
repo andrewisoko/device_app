@@ -24,14 +24,14 @@ export class Contract extends Document {
     @Prop({ type: Number, required:false, default: 50 })
         sender_percentage: number;
 
-    @Prop({ type: Number, required:false, default: 50 })
-        receiver_percentage: number;
+    @Prop({ type: [Number], required:false, default: 50 })
+        receiver_percentage: number[];
 
-    @Prop({ type: Number, required:false, defaul: 5 })
+    @Prop({ type:Number, required:false, defaul: 5 })
         sender_amount: number;
 
-    @Prop({ type: Number, required:false, default: 5 })
-        receiver_amount: number 
+    @Prop({ type:[Number], required:false, default: 5 })
+        receiver_amount: number[] 
 
     @Prop({
         type: String,
