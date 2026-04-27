@@ -18,7 +18,7 @@ export class Inbox {
         history: Partial<Contract>[];
 
         @OneToOne(() => User, user => user.inbox )
-        user: User;
+        user: User;  /*check user database */
 
         @OneToOne(() => Contract, contract => contract.inbox)
         @JoinColumn({ name: 'contract_id' })

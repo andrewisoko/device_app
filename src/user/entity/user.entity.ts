@@ -1,4 +1,4 @@
-import { Entity,PrimaryGeneratedColumn, Column, OneToOne,JoinColumn } from "typeorm";
+import { Entity,PrimaryGeneratedColumn, Column, OneToOne,JoinColumn,CreateDateColumn,UpdateDateColumn } from "typeorm";
 import { OneToOne as TypeORMOneToOne } from "typeorm";
 import { Inbox } from "src/inbox/entity/inbox.entity";
 
@@ -55,5 +55,10 @@ export class User {
     
     @OneToOne( ()=> Inbox,inbox => inbox.user )
         @JoinColumn()
-        inbox: Inbox
+        inbox: Inbox;
+    @CreateDateColumn({ name: 'created_at' })
+        createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at' })
+        updatedAt: Date;
 }

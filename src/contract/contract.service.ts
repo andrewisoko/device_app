@@ -83,6 +83,8 @@ export class ContractService {
                 await this.inboxService.postInbox(contractCreated ,receiverUser)
             }
         }
+
+        return 'contract sent to receivers.'
                     
     }
 

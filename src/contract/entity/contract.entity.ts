@@ -35,7 +35,7 @@ export class Contract {
     @Column('varchar', { default: ["2026-04-18T12:00:00Z", "2026-04-18T15:00:00Z" ] })
         time_agreement: Date[]
 
-    @Column({ type: 'decimal', precision: 6, scale: 2, default: 50 })
+    @Column({ type: 'numeric', default: 50 })
         sender_percentage: number;
 
     @Column({ type: 'simple-array', nullable: true })
