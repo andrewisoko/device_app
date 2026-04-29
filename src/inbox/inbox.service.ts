@@ -82,6 +82,7 @@ export class InboxService {
             throw new BadRequestException('contractId and receiverUsername are required');
         };
 
+        
         const receiverUser = await this.userRepository.findOne({
             where: { id: receiverId as string },
             relations: ['inbox'],
