@@ -43,7 +43,7 @@ export class Contract {
     @Column({ type: 'simple-array', nullable: true })
         receiver_percentage: number[];
 
-    @Column({ type: 'decimal', precision: 6, scale: 2, default: 0 })
+    @Column({ type: 'numeric', default: 0 })
         sender_amount: number;
 
     @Column({ type: 'simple-array', nullable: true })
