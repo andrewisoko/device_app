@@ -8,6 +8,9 @@ import { UserType } from 'src/user/entity/user.entity';
 import { InboxService } from 'src/inbox/inbox.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { AccountDocument } from 'src/account/document/account.doc';
+import { Model } from 'mongoose';
 
 
 
@@ -34,6 +37,7 @@ export class ContractService {
     constructor( 
         @InjectRepository( Contract ) private readonly contractRepository: Repository<Contract>,
         @InjectRepository( User ) private readonly userRepository:Repository<User>,
+        @InjectModel('Account') private readonly accountModel:Model<AccountDocument>,
         private readonly userService: UserService,
         private readonly inboxService: InboxService,
  ){}
@@ -46,11 +50,26 @@ export class ContractService {
 
         // const receiverIds: MongoId[] = parseMongoIds(contract.receiver ?? []);
 
+        const senderUser = await this.userRepository.findOne({where:{user_name:contract.sender}});
+        if( ! senderUser ) throw new NotFoundException("error at send contract level 404: sender user not found")
+        const senderAccountId = senderUser.accounts[0];
+
+
+        let receiverAccountIds :string[] = [];
+
+        for ( const usernames of contract.receiver?? []){
+            const receiverUser = await this.userRepository.findOne({where:{user_name:usernames}})
+            if(! receiverUser ) throw new NotFoundException("error at send contract level 404: receiver user not found")
+
+            receiverAccountIds.push(String(receiverUser.accounts[0]))
+        }
+     
+
         const contractPayload = this.contractRepository.create({
-            sender: contract.sender,
+            sender: senderAccountId,
             sender_percentage:contract.sender_percentage,
             sender_amount:contract.sender_amount,
-            receiver: contract.receiver,
+            receiver: receiverAccountIds,
             time_agreement: contract.time_agreement,
             receiver_percentage:contract.receiver_percentage,
             receiver_amount:contract.receiver_amount,
@@ -64,9 +83,14 @@ export class ContractService {
         const contractCreated = await this.contractRepository.save(contractPayload);
 
         // Handle multiple receivers
-        for (const receiverId of contractCreated.receiver) {
+        for (const receiverAccountId of contractCreated.receiver) {
 
-            const receiverUser = await this.userRepository.findOne({ where: { id: receiverId as string } });
+            const receiverAccountUser = await this.accountModel.findById(receiverAccountId).exec();
+            if (!receiverAccountUser) {
+                continue;
+            }
+
+            const receiverUser = await this.userRepository.findOne({ where: { id: String(receiverAccountUser.customer) } });
           
             if ( ! receiverUser ){
 

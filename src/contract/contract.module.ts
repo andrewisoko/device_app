@@ -8,9 +8,12 @@ import { User } from 'src/user/entity/user.entity';
 import { Inbox } from 'src/inbox/entity/inbox.entity';
 import { UserModule } from 'src/user/user.module';
 import { InboxModule } from 'src/inbox/inbox.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { AccountSchema } from 'src/account/document/account.doc';
 
 @Module({
   imports:[
+    MongooseModule.forFeature([{ name: 'Account', schema: AccountSchema }]),
     TypeOrmModule.forFeature([
       Contract,
       Transaction,

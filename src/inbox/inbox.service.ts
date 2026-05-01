@@ -4,8 +4,10 @@ import {
     NotFoundException,
     UnauthorizedException,
 } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Model } from 'mongoose';
 import { Inbox } from './entity/inbox.entity';
 import { User } from 'src/user/entity/user.entity';
 import { Contract, CONTRACT_STATUS } from 'src/contract/entity/contract.entity';
@@ -13,6 +15,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { firstValueFrom } from 'rxjs';
+import { Account, AccountDocument } from 'src/account/document/account.doc';
 
 
 @Injectable()
@@ -22,6 +25,7 @@ export class InboxService {
         @InjectRepository( Inbox ) private readonly inboxRepository: Repository<Inbox>,
         @InjectRepository( User ) private readonly userRepository: Repository<User>,
         @InjectRepository( Contract ) private readonly contractRepository: Repository<Contract>,
+        @InjectModel('Account') private readonly accountModel: Model<AccountDocument>,
         private readonly httpService: HttpService,
         private readonly configService: ConfigService,
         private readonly jwtService: JwtService,
@@ -97,36 +101,39 @@ export class InboxService {
     };
 
 
-    async ContractReceivedOnInbox( contractId: string, receiverId: string, accepted:boolean ){
+    async ContractReceivedOnInbox( contractId: string, receiverAccountId: string, accepted:boolean ){
 
         let inboxReceiver;
 
         try {
             
-            if (!contractId || !receiverId) {
+            if (!contractId || !receiverAccountId) {
                 throw new BadRequestException('contractId and receiverUsername are required');
             };
     
             
+            const receiverAccountUser = await this.accountModel.findById(receiverAccountId).exec();
+            if (!receiverAccountUser) {
+                throw new NotFoundException('Receiver account not found');
+            };
+
             const receiverUser = await this.userRepository.findOne({
-                where: { id: receiverId as string },
+                where: { id: String(receiverAccountUser.customer) },
                 relations: ['inbox'],
             });
-    
             if (!receiverUser) {
                 throw new NotFoundException('Receiver user not found');
             };
-    
             const contract = await this.contractRepository.findOne({ where: { id: contractId } });
     
             if (!contract) {
                 throw new NotFoundException('Contract not found');
             };
     
-            const receivers = Array.isArray(contract.receiver) ? contract.receiver : [];
-            if (!receivers.includes(receiverId as string)) {
-                throw new UnauthorizedException('Receiver is not a participant in this contract');
-            };
+            // const receivers = Array.isArray(contract.receiver) ? contract.receiver : [];
+            // if (!receivers.includes(receiverUser.id) && !receivers.includes(receiverAccountId)) {
+            //     throw new UnauthorizedException('Receiver is not a participant in this contract');
+            // };
 
             contract.contract_status = accepted ? CONTRACT_STATUS.ACCEPTED : CONTRACT_STATUS.DECLINED;
 
@@ -183,10 +190,10 @@ export class InboxService {
     
                 const bearerToken = this.createContractToken(
                     contractKey,
-                    receiverId,
+                    receiverUser.id,
                     contractDecision.id,
                     {
-                        account: Array.isArray(receiverUser.accounts) ? receiverUser.accounts[0] : undefined,
+                        account: contractDecision.sender,
                         role: "contract",
                     },
                 );
@@ -212,7 +219,7 @@ export class InboxService {
                         repayment_agreement: contractDecision.repayment_agreement,
                         event_agreement: contractDecision.event_agreement,
                         location_agreement: contractDecision.location_agreement,
-                        acceptedBy: receiverId,
+                        acceptedBy: receiverUser.id,
                     },
                     {
                         headers: {

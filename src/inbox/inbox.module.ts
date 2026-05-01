@@ -8,12 +8,15 @@ import { Contract } from 'src/contract/entity/contract.entity';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { MongooseModule } from '@nestjs/mongoose';
+import { AccountSchema } from 'src/account/document/account.doc';
 
 @Module({
   imports: [
     HttpModule,
     ConfigModule,
     JwtModule.register({}),
+    MongooseModule.forFeature([{ name: 'Account', schema: AccountSchema }]),
     TypeOrmModule.forFeature([
       Inbox,
       User,
