@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, NotFoundException, UnauthorizedExceptio
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Account, AccountDocument, ACCOUNT_STATUS } from './document/account.doc';
-import { User } from 'src/user/entity/user.entity';
+import { User, UserType } from 'src/user/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { VirtualCardService } from 'src/virtual_card/virtual.card.service';
@@ -59,13 +59,15 @@ export class AccountService {
         });
 
 
-        const userVirtualCard = await this.virtualCardService.createMainCard(
-            fullName,
-            newAccount._id
-        );
+        if (user.user_type !== UserType.DEFAULT) {
+            const userVirtualCard = await this.virtualCardService.createMainCard(
+                fullName,
+                newAccount._id
+            );
 
-        const savedVirstualCard = await this.virtualCardRepository.save(userVirtualCard);
-        newAccount.mainVirtualCard.push(savedVirstualCard.id);
+           newAccount.mainVirtualCard = userVirtualCard.id
+           await this.virtualCardRepository.save(userVirtualCard)
+        }
 
         return await newAccount.save();
     }

@@ -43,40 +43,41 @@ export class VirtualCardService {
       
         return this.vcRepository.create({
 
-            cardType:CARDTYPE.MAIN,
-            fullName:fullName,
+            card_type: CARDTYPE.MAIN,
+            full_name: fullName,
             pan: pan,
-            CVC:CVC,
-            expiry:expiryDate,
-            billingAddress: '26, LONDON STREET, LEEDS, L20 3FX'
+            CVC: CVC,
+            expiry: expiryDate,
+            billing_address: '26, LONDON STREET, LEEDS, L20 3FX'
 
         })
     }
 
-    async createTempCard( 
+    async createTempCard(
 
-        fullName:string,
-        expiryTime:string,
-        id:string
+        fullName: string,
+        expiryTime: string,
+        senderAccountId: string,
+        accountUsers: string[],
     ){
 
         const CVC = Math.floor(Math.random() * 1000 ).toString();
-        const account = await this.account(id);
+        const account = await this.account(senderAccountId);
         const expiryDate = account.expDate;
         const pan = account.pan;
 
-            return this.vcRepository.create({
-
-            cardType:CARDTYPE.TEMP,
-            fullName:fullName,
+        const tempCard = this.vcRepository.create({
+            card_type: CARDTYPE.TEMP,
+            full_name: fullName,
             pan: pan,
-            CVC:CVC,
-            expiry:expiryDate,
-            expiryTime: expiryTime,
-            billingAddress: '26, LONGWAY ROAD, MANCHESTER, M13 19XD'
+            CVC: CVC,
+            expiry: expiryDate,
+            expiry_time: expiryTime,
+            billing_address: '26, LONGWAY ROAD, MANCHESTER, M13 19XD',
+            account_users: accountUsers,
+        });
 
-        })
-
+        return this.vcRepository.save(tempCard);
     }
 
     cardQRCode(pan:string,expiry:string){

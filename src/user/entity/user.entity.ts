@@ -1,4 +1,4 @@
-import { Entity,PrimaryGeneratedColumn, Column, OneToOne,JoinColumn,CreateDateColumn,UpdateDateColumn } from "typeorm";
+import { Entity,PrimaryGeneratedColumn, Column, OneToOne,JoinColumn,CreateDateColumn,UpdateDateColumn, ManyToOne } from "typeorm";
 import { OneToOne as TypeORMOneToOne } from "typeorm";
 import { Inbox } from "src/inbox/entity/inbox.entity";
 
@@ -32,10 +32,10 @@ export class User {
     })
         user_type: UserType
 
-    @Column( 'varchar', { length:10 , default: 'user' })
+    @Column( 'varchar', { length:10 , default: 'Default' })
         name:string;
 
-    @Column( 'varchar', { length:10 , default: 'Default' })
+    @Column( 'varchar', { length:10 , default: 'User' })
         surname:string;
 
     @Column( 'varchar', { default:123435673 } )
@@ -52,13 +52,13 @@ export class User {
 
     @Column( 'varchar', { default: 'Passwordxmx0'} )
         password:string;  
-    
+
     @OneToOne( ()=> Inbox,inbox => inbox.user )
         @JoinColumn()
         inbox: Inbox;
     @CreateDateColumn({ name: 'created_at' })
-        createdAt: Date;
+        created_at: Date;
 
     @UpdateDateColumn({ name: 'updated_at' })
-        updatedAt: Date;
+        updated_at: Date;
 }

@@ -20,10 +20,11 @@ export class VirtualCardController {
             @Body() dataDto:{
                 fullName:string,
                 expiryTime:string,
-                id:string
+                id:string,
+                accountUsers:string[]
             }
         ){
-            return this.virtualCardService.createTempCard(dataDto.fullName,dataDto.expiryTime,dataDto.id)
+            return this.virtualCardService.createTempCard(dataDto.fullName,dataDto.expiryTime,dataDto.id,dataDto.accountUsers)
         }
 
     

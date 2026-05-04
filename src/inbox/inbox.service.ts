@@ -18,6 +18,7 @@ import { firstValueFrom } from 'rxjs';
 import { Account, AccountDocument } from 'src/account/document/account.doc';
 import { ObjectId } from 'typeorm/browser';
 import { VirtualCard } from 'src/virtual_card/entity/virtual.card.entity';
+import { VirtualCardService } from 'src/virtual_card/virtual.card.service';
 
 
 @Injectable()
@@ -32,6 +33,7 @@ export class InboxService {
         private readonly httpService: HttpService,
         private readonly configService: ConfigService,
         private readonly jwtService: JwtService,
+        private readonly virtualCardService: VirtualCardService,
     ) {}
 
     
@@ -69,8 +71,8 @@ export class InboxService {
                 repayment_agreement: contract.repayment_agreement,
                 event_agreement: contract.event_agreement,
                 location_agreement: contract.location_agreement,
-                createdAt: contract.createdAt,
-                updatedAt: contract.updatedAt,
+                created_at: contract.created_at,
+                updated_at: contract.updated_at,
             };
     
             const existingInbox = await this.inboxRepository.findOne({
@@ -81,7 +83,7 @@ export class InboxService {
                 const existingHistory = Array.isArray(existingInbox.history) ? existingInbox.history : [];
     
                 existingInbox.history = [...existingHistory, contractSnapshot];
-                existingInbox.mostRecent = [contractSnapshot];
+                existingInbox.most_recent = [contractSnapshot];
                 existingInbox.contract = contract;
                 existingInbox.user = user;
     
@@ -90,7 +92,7 @@ export class InboxService {
     
             const inboxPayload = this.inboxRepository.create({
                 history:[contractSnapshot],
-                mostRecent:[contractSnapshot],
+                most_recent:[contractSnapshot],
                 contract:contract,
                 user:user,
             });
@@ -147,13 +149,13 @@ export class InboxService {
                     repayment_agreement: contractDecision.repayment_agreement,
                     event_agreement: contractDecision.event_agreement,
                     location_agreement: contractDecision.location_agreement,
-                    createdAt: contractDecision.createdAt,
-                    updatedAt: contractDecision.updatedAt,
+                    created_at: contractDecision.created_at,
+                    updated_at: contractDecision.updated_at,
                 };
 
                 const existingHistory = Array.isArray(inboxReceiver.history) ? inboxReceiver.history : [];
                 inboxReceiver.history = [...existingHistory, decisionSnapshot];
-                inboxReceiver.mostRecent = [decisionSnapshot];
+                inboxReceiver.most_recent = [decisionSnapshot];
                 inboxReceiver.contract = contractDecision;
                 inboxReceiver.user = receiverUser;
 
@@ -165,8 +167,20 @@ export class InboxService {
 
                     await this.inboxRepository.save(inboxReceiver);
 
-                    contract.contract_type = CONTRACT_TYPE.EXISTING_USER
-                    await this.contractRepository.save(contract)
+                    contract.contract_type = CONTRACT_TYPE.EXISTING_USER;
+                    await this.contractRepository.save(contract);
+
+                    // Build temp card for all contract participants
+                    const senderAccount = await this.accountModel.findById(contractDecision.sender).exec();
+                    if (senderAccount) {
+                        const senderUser = await this.userRepository.findOne({ where: { id: String(senderAccount.customer) } });
+                        const fullName = senderUser ? `${senderUser.name} ${senderUser.surname}` : senderAccount.fullName;
+                        const accountUsers = [contractDecision.sender, ...contractDecision.receiver];
+                        const expiryTime = Array.isArray(contractDecision.time_agreement)
+                            ? String(contractDecision.time_agreement[1])
+                            : this.parseTimeAgreement(contractDecision.time_agreement)[1] ?? '';
+                        await this.virtualCardService.createTempCard(fullName, expiryTime, contractDecision.sender, accountUsers);
+                    }
 
                     const gatewayUrl = this.configService.get<string>('CONTRACT_GATEWAY_URL');
                     if (!gatewayUrl) throw new NotFoundException('gateway url not found');
@@ -227,14 +241,29 @@ export class InboxService {
                         relations: ['inbox'],
                     });
                     if( ! userDefault ) throw new NotFoundException( 'default user not found');
+                    const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
                     await this.accountModel.deleteOne(accountDefaultReceiver);
-                    await this.vcRepository.delete(accountDefaultReceiver.mainVirtualCard);
-                    if (userDefault.inbox?.id) await this.inboxRepository.delete(userDefault.inbox.id);
-                    await this.userRepository.delete(accountDefaultReceiver.customer);
-                    
+                    console.log("default user bank account deleted");
 
-                    console.log(`Default user ${ accountDefaultReceiver.customer } data deleted after contract declined`);
+                    if (accountDefaultReceiver.mainVirtualCard && isValidUuid.test(String(accountDefaultReceiver.mainVirtualCard))) {
+                        await this.vcRepository.delete(String(accountDefaultReceiver.mainVirtualCard));
+                        console.log("default user virtual card deleted");
+                    }
+
+                    // Nullify the inbox FK on the user row before deleting inbox
+                    if (userDefault.inbox?.id) {
+                        const inboxId = userDefault.inbox.id;
+                        userDefault.inbox = null as unknown as Inbox;
+                        await this.userRepository.save(userDefault);
+                        await this.inboxRepository.delete(inboxId);
+                        console.log("default user inbox deleted");
+                    }
+
+                    await this.userRepository.delete(accountDefaultReceiver.customer);
+                    console.log("default user deleted");
+
+                    console.log(`All Default user ${ accountDefaultReceiver.customer } data succesfully deleted after contract declined`);
                    
 
                     return {

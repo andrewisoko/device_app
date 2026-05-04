@@ -11,6 +11,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AccountSchema } from 'src/account/document/account.doc';
 import { VirtualCard } from 'src/virtual_card/entity/virtual.card.entity';
+import { VirtualCardService } from 'src/virtual_card/virtual.card.service';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { VirtualCard } from 'src/virtual_card/entity/virtual.card.entity';
     ]),
   ],
   controllers: [InboxController],
-  providers: [InboxService],
+  providers: [InboxService, VirtualCardService],
   exports: [InboxService],
 })
 export class InboxModule {}

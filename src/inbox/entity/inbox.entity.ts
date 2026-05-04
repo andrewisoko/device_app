@@ -6,25 +6,25 @@ import { Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn, CreateDateColumn,
 export class Inbox {
 
         @PrimaryGeneratedColumn('uuid')
-        id: string;
+                id: string;
 
          @CreateDateColumn({ name: 'created_at' })
-                createdAt: Date;
+                created_at: Date;
         
         @UpdateDateColumn({ name: 'updated_at' })
-        updatedAt: Date;
+                updated_at: Date;
 
         @Column({ nullable: true, type: 'simple-json' })
-        mostRecent: Partial<Contract>[];
+                most_recent: Partial<Contract>[];
 
         @Column({ nullable: true, type: 'simple-json' })
-        history: Partial<Contract>[];
+                history: Partial<Contract>[];
 
         @OneToOne(() => User, user => user.inbox )
-        user: User;  /*check user database */
+                user: User;  /*check user database */
 
         @OneToOne(() => Contract, contract => contract.inbox)
         @JoinColumn({ name: 'contract_id' })
-        contract: Contract;
+                contract: Contract;
 
 }

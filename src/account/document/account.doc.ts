@@ -44,8 +44,8 @@ export class Account extends Document {
     })
         status: ACCOUNT_STATUS;
 
-      @Prop({ type: [String], default: [] })
-          mainVirtualCard: string[];
+      @Prop({ type: String, default: 'default main card'})
+          mainVirtualCard: string;
 
       @Prop({ type: [String], required:false, default: [] })
           tempVirtualCard: string[];
